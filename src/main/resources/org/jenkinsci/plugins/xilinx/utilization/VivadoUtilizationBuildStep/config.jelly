@@ -1,0 +1,12 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core"
+         xmlns:f="/lib/form">
+    <style type="text/css">
+        td.setting-name {
+            vertical-align:middle;
+        }             
+    </style>
+    <f:entry title="${%Utilization Report Path}" field="report">
+        <f:textbox/>
+    </f:entry>
+</j:jelly>
