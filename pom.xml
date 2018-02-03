@@ -11,6 +11,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <properties>
+        <java.level>8</java.level>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
         <jenkins.version>2.7.3</jenkins.version>
         <!-- Other properties you may want to use:
@@ -77,8 +78,34 @@
             <version>2.14</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>credentials</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>net.praqma</groupId>
+            <artifactId>memory-map</artifactId>
+            <version>2.2.0</version>
+        </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jenkins-ci.tools</groupId>
+                <artifactId>maven-hpi-plugin</artifactId>
+                <!-- Older version have some problems with writing the manifest file -->
+                <configuration>
+                    <pluginVersionDescription>${buildNumber}</pluginVersionDescription>
+                    <compatibleSinceVersion>2.0</compatibleSinceVersion>
+                    <webAppConfig>
+                        <PersistTempDirectory>true</PersistTempDirectory>
+                    </webAppConfig>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <!-- If you want this to appear on the wiki page:
     <developers>
       <developer>
@@ -100,6 +127,10 @@
             <id>repo.jenkins-ci.org</id>
             <url>https://repo.jenkins-ci.org/public/</url>
         </repository>
+        <repository>
+            <id>praqma</id>
+            <url>http://code.praqma.net/repo/maven</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -108,4 +139,3 @@
         </pluginRepository>
     </pluginRepositories>
 </project>
-<!---->
