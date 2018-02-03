@@ -9,8 +9,8 @@
         <module name="xilinx-reports-plugin" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="xilinx-reports-plugin" target="1.5" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="xilinx-reports-plugin" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
