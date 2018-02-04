@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 @Extension
 public class VivadoUtilizationParser extends AbstractMemoryMapParser implements Serializable {
     private static final Logger LOG = Logger.getLogger(VivadoUtilizationParser.class.getName());
-    private static final Pattern RESOURCE_PATTERN = Pattern.compile("^\\| (?:([^\\|]+)\\|){5}$", Pattern.MULTILINE);
 
     private static final ArrayList<MemoryMapGraphConfiguration> xilinxUtilizationGraphs = new ArrayList<MemoryMapGraphConfiguration>() {{
         add(new MemoryMapGraphConfiguration("Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs", "Slices"));
@@ -83,15 +82,15 @@ public class VivadoUtilizationParser extends AbstractMemoryMapParser implements 
             String[] cells = sectionMatched.group(0).split("\\|");
             if (cells[4].trim().matches("\\d+")) {
                 String name = cells[1].trim().replace(' ', '_');
-                String used_str = Long.toString((int) Float.parseFloat(cells[2].trim()));
-                String total_str = cells[4].trim();
+                // We can use fractional BRAMS, so we have to parse as a float.
+                int used = (int) Float.parseFloat(cells[2].trim());
+                int total = Integer.parseUnsignedInt(cells[4].trim());
+                int unused = total - used;
 
-                //This is necessary to be compatible with the HexUtils, but is awkward.
-                String total = "0x" + Long.toHexString(Long.parseLong(total_str));
-                String used = "0x" + Long.toHexString((long) Double.parseDouble(used_str));
-                MemoryMapConfigMemoryItem it = new MemoryMapConfigMemoryItem(name, "0", total);
-                it.setUsed(used);
-                items.add(it);
+                String total_str = Integer.toString(total);
+                String used_str = Integer.toString(used);
+                String unused_str = Integer.toString(unused);
+                items.add(new MemoryMapConfigMemoryItem(name, "0", total_str, used_str, unused_str));
             }
         }
 
@@ -109,6 +108,9 @@ public class VivadoUtilizationParser extends AbstractMemoryMapParser implements 
     }
 
     @Override
+    /**
+     * This is actually used as the radix
+     */
     public int getDefaultWordSize() {
         return 10;
     }
