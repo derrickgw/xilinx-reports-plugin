@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.xilinx.utilization;
 
+import hudson.FilePath;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Label;
@@ -10,12 +11,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.Arrays;
+
 public class VivadoUtilizationBuildStepTest {
 
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
 
-    private String report_file;
+    private String report_file = "utilization.rpt";
     private FreeStyleProject project;
 
     @Test
@@ -29,14 +34,20 @@ public class VivadoUtilizationBuildStepTest {
     @Test
     public void testFreeStyleBuild() throws Exception {
         setUpFreeStyle();
+        //Run job to create workspace
+        jenkins.buildAndAssertSuccess(project);
+        FilePath workspace = project.getSomeWorkspace();
+        FilePath file = new FilePath(workspace, report_file);
+        file.copyFrom(VivadoUtilizationBuildStepTest.class.getResource(report_file));
+
+        //Now run for real
         FreeStyleBuild build = jenkins.buildAndAssertSuccess(project);
-        //TODO: update for the actual expected strings.
         System.out.println(build.getLogText());
-//        jenkins.assertLogContains("Hello, ", build);
+        jenkins.assertLogContains("Printing configuration", build);
+        jenkins.assertLogContains("Xilinx Utilization", build);
     }
 
     public void setUpFreeStyle() throws Exception {
-        report_file = VivadoUtilizationParserTest.class.getResource("utilization.rpt").getFile();
         VivadoUtilizationBuildStep dut = new VivadoUtilizationBuildStep(report_file);
         project = jenkins.createFreeStyleProject();
         project.getPublishersList().add(dut);
@@ -44,6 +55,7 @@ public class VivadoUtilizationBuildStepTest {
 
     @Test
     public void testScriptedPipeline() throws Exception {
+        //TODO: figure out how to copy a resource to a pipeline workspace.
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
@@ -52,9 +64,13 @@ public class VivadoUtilizationBuildStepTest {
                 + "  xilinxUtilization '" + report_file + "'\n"
                 + "}";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+//        File buildDir = job.getBuildDir();
+//        FilePath file = new FilePath(new FilePath(buildDir), report_file);
+//        file.copyFrom(VivadoUtilizationBuildStepTest.class.getResource(report_file));
+
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
-//        String expectedString = "Hello, " + "!";
-//        jenkins.assertLogContains(expectedString, completedBuild);
+//        jenkins.assertLogContains("Printing Configuration", completedBuild);
+//        jenkins.assertLogContains("Xilinx Utilization", completedBuild);
     }
 
 }
