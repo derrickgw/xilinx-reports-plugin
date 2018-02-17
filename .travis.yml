@@ -1,0 +1,15 @@
+language: java
+
+script:
+  - mvn package -B
+
+deploy:
+  provider: releases
+  api_key:
+    secure: gVt1jT0/B4Z7ldZwaUw9qaMR33k8wnKf2xAvVImnALrUDr0dGDiesx2MAfbbehx8iiRNfF6B9Puj93jSgqu4X7FjfMVZ8wjuO3QWcJe7RM+h04P6boteocHWP/hLb0Ejq880G6CinWuakV2As+Xk7TtxsXU7zKzgRHW9B87OcS/5nJXdM8z6BWYOR7awHCm8VwoUu/SiBucHJ+OUBb/XA/8nP0qzWfyNqHhOnYJF6W99LuMDE6lEXDLZVObj1IjgSykHkHvOSr58d+Hq9aL/Suy114WjV2CLlDutlfXWPyJTQ01asUe3dwd2RQYAElOIegWTFmS4pYCMFTn+VvlNFSI5mD9PBxGsYZe2YVpxyJpyLgrmBerrHPxMurH1QLZxCjcXYAERlw6oPgRgmx2ZqB1fKW4De0EPHDr1FWfiy/oq/kAnVznACAfIZDWb5v18fXEULxzrhNluJh0CpOrleYpeAWX9zV/66SoOQYan3PndQ/ROxKU0NutTlG/runI3cx1sNP884a4+z1I90gwt96tib5yZYJzp4YsiYSBcdJbnEifIy4MkvPGaV82F/oPECb6nFUi5wKq3Idkr+ntyF/9e1u8Zy6UlN37zf0YOMOlaJlnJpOxYl6N4RXoj56YkE9BIxbnyiaVwx/+6jMO90ZQdleacJDYyC8w6e4QZHzc=
+  file: target/xilinx-reports.hpi
+  skip_cleanup: true
+  on:
+    repo: derrickgw/xilinx-reports-plugin
+    tags: true
+
