@@ -5,6 +5,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractProject;
+import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
@@ -89,6 +90,7 @@ public class VivadoUtilizationBuildStep extends Recorder implements SimpleBuildS
                 throw new AbortException(String.format("Unspecified error. Please review error message.%nPlease install the logging plugin to record the standard java logger output stream."
                         + "%nThe plugin is described here: https://wiki.jenkins-ci.org/display/JENKINS/Logging+plugin and requires core 1.483  "));
             }
+            build.setResult(Result.FAILURE);
             return;
         }
 
