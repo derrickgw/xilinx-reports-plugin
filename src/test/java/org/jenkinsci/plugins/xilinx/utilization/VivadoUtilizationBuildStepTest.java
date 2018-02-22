@@ -59,9 +59,13 @@ public class VivadoUtilizationBuildStepTest {
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
+
         String pipelineScript
                 = "node {\n"
-                + "  xilinxUtilization '" + report_file + "'\n"
+                + "  xilinxUtilization report: '" + report_file + "' \n"
+                + "      graphConfiguration: [[graphCaption: 'DSPs', graphDataList: 'DSPs'], \n"
+                + "                           [graphCaption: 'BRAM', graphDataList: 'Block_RAM_Tile'], \n"
+                + "                           [graphCaption: 'Slices', graphDataList: 'Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs']] \n"
                 + "}";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
 //        File buildDir = job.getBuildDir();
