@@ -16,6 +16,8 @@ import hudson.util.FormValidation;
 import jenkins.tasks.SimpleBuildStep;
 import net.praqma.jenkins.memorymap.MemoryMapBuildAction;
 import net.praqma.jenkins.memorymap.MemoryMapRecorder;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfigurationDescriptor;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.MemoryMapConfigFileParserDelegate;
 import net.praqma.jenkins.memorymap.parser.MemoryMapMapParserDelegate;
@@ -37,49 +39,59 @@ import java.util.logging.Logger;
 public class VivadoUtilizationBuildStep extends Recorder implements SimpleBuildStep { //extends MemoryMapRecorder {
 
     private static final Logger logger = Logger.getLogger(MemoryMapRecorder.class.getName());
-    private final String report;
-    private List<AbstractMemoryMapParser> chosenParsers;
-    private MemoryMapRecorder recorder;
+    private VivadoUtilizationParser parser;
 
     @DataBoundConstructor
-    public VivadoUtilizationBuildStep(String report) {
-        this.report = report;
-
-        chosenParsers = new ArrayList<>();
-        VivadoUtilizationParser parser = new VivadoUtilizationParser(report);
-        chosenParsers.add(parser);
-
-        recorder = new MemoryMapRecorder(chosenParsers);
-        recorder.setScale("default");
-        recorder.setShowBytesOnGraph(false);
-        recorder.setWordSize(parser.getDefaultWordSize()); //Actually radix.
-    }
-
-    /**
-     * @return the chosenParsers
-     */
-    public List<AbstractMemoryMapParser> getChosenParsers() {
-        return chosenParsers;
+    public VivadoUtilizationBuildStep(String report, List<MemoryMapGraphConfiguration> graphConfiguration) {
+        this.parser = new VivadoUtilizationParser(report, graphConfiguration);
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
     }
 
+    public List<MemoryMapGraphConfiguration> getGraphConfiguration() {
+        if (this.parser == null)
+            return VivadoUtilizationParser.defaultGraphConfiguration;
+        else
+            return this.parser.getGraphConfiguration();
+    }
+
+    public List<MemoryMapGraphConfiguration> getDefaultGraphConfiguration() {
+        return VivadoUtilizationParser.defaultGraphConfiguration;
+    }
+
     public String getReport() {
-        return this.report;
+        if (this.parser == null)
+            return VivadoUtilizationParser.defaultReport;
+        else
+            return this.parser.getReport();
+    }
+
+    public String getDefaultReport() {
+        return VivadoUtilizationParser.defaultReport;
     }
 
     @Override
     public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-        listener.getLogger().println("Report Files  = " + report + "!");
+        listener.getLogger().println("Report Files  = " + parser.getReport() + "!");
 
         PrintStream out = listener.getLogger();
         HashMap<String, MemoryMapConfigMemory> config;
+        List<AbstractMemoryMapParser> chosenParsers;
+        MemoryMapRecorder recorder;
+
+        chosenParsers = new ArrayList<>();
+        chosenParsers.add(parser);
+
+        recorder = new MemoryMapRecorder(chosenParsers);
+        recorder.setScale("default");
+        recorder.setShowBytesOnGraph(false);
+        recorder.setWordSize(parser.getDefaultWordSize()); //Actually radix.
 
         try {
-            config = workspace.act(new MemoryMapConfigFileParserDelegate(getChosenParsers()));
-            config = workspace.act(new MemoryMapMapParserDelegate(getChosenParsers(), config));
+            config = workspace.act(new MemoryMapConfigFileParserDelegate(chosenParsers));
+            config = workspace.act(new MemoryMapMapParserDelegate(chosenParsers, config));
         } catch (IOException ex) {
             //Catch all known errors (By using a marker interface)
             if (ex instanceof MemoryMapError) {
@@ -103,7 +115,7 @@ public class VivadoUtilizationBuildStep extends Recorder implements SimpleBuildS
         MemoryMapBuildAction buildAction = new VivadoUtilizationBuildAction(build, config);
         buildAction.setRecorder(recorder);
         buildAction.setMemoryMapConfigs(config);
-        buildAction.setChosenParsers(getChosenParsers());
+        buildAction.setChosenParsers(chosenParsers);
         build.addAction(buildAction);
     }
 
@@ -114,6 +126,10 @@ public class VivadoUtilizationBuildStep extends Recorder implements SimpleBuildS
         public DescriptorImpl() {
             super(VivadoUtilizationBuildStep.class);
             load();
+        }
+
+        public List<MemoryMapGraphConfigurationDescriptor<?>> getGraphOptions() {
+            return MemoryMapGraphConfiguration.getDescriptors();
         }
 
         @Override

@@ -7,6 +7,11 @@
         }             
     </style>
     <f:entry title="${%Utilization Report Path}" field="report">
-        <f:textbox/>
+        <f:textbox default="utilization.rpt"/>
+    </f:entry>
+    <f:entry field="graphConfiguration" title="Configure graphs">
+        <f:hetero-list name="graphConfiguration" oneEach="false" items="${instance.graphConfiguration}"
+        addCaption="Add graph" deleteCaption="Remove graph" descriptors="${descriptor.getGraphOptions()}"
+        default="${instance.getDefaultGraphConfiguration()}" />
     </f:entry>
 </j:jelly>
