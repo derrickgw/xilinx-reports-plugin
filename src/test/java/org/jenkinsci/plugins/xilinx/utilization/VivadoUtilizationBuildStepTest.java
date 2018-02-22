@@ -27,7 +27,7 @@ public class VivadoUtilizationBuildStepTest {
     public void testConfigRoundtrip() throws Exception {
         setUpFreeStyle();
         FreeStyleProject config_project = jenkins.configRoundtrip(project);
-        jenkins.assertEqualDataBoundBeans(new VivadoUtilizationBuildStep(report_file),
+        jenkins.assertEqualDataBoundBeans(new VivadoUtilizationBuildStep(report_file, VivadoUtilizationParser.defaultGraphConfiguration),
                 config_project.getPublishersList().get(0));
     }
 
@@ -48,7 +48,7 @@ public class VivadoUtilizationBuildStepTest {
     }
 
     public void setUpFreeStyle() throws Exception {
-        VivadoUtilizationBuildStep dut = new VivadoUtilizationBuildStep(report_file);
+        VivadoUtilizationBuildStep dut = new VivadoUtilizationBuildStep(report_file, VivadoUtilizationParser.defaultGraphConfiguration);
         project = jenkins.createFreeStyleProject();
         project.getPublishersList().add(dut);
     }
