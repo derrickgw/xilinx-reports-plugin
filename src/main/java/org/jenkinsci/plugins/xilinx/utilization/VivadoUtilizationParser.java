@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 @Extension
 public class VivadoUtilizationParser extends AbstractMemoryMapParser implements Serializable {
     private static final Logger LOG = Logger.getLogger(VivadoUtilizationParser.class.getName());
+    private static final int RADIX = 10;
 
     private static final ArrayList<MemoryMapGraphConfiguration> xilinxUtilizationGraphs = new ArrayList<MemoryMapGraphConfiguration>() {{
         add(new MemoryMapGraphConfiguration("Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs", "Slices"));
@@ -34,7 +35,7 @@ public class VivadoUtilizationParser extends AbstractMemoryMapParser implements 
 
     @DataBoundConstructor
     public VivadoUtilizationParser(String utlilizationReport) {
-        super("Xilinx Utilization", utlilizationReport, utlilizationReport, 8, false, xilinxUtilizationGraphs);
+        super("Xilinx Utilization", utlilizationReport, utlilizationReport, RADIX, false, xilinxUtilizationGraphs);
     }
 
     public VivadoUtilizationParser() {
@@ -112,7 +113,7 @@ public class VivadoUtilizationParser extends AbstractMemoryMapParser implements 
      * This is actually used as the radix
      */
     public int getDefaultWordSize() {
-        return 10;
+        return RADIX;
     }
 
     private static class MemoryMapMemItemComparator implements Comparator<MemoryMapConfigMemoryItem>, Serializable {

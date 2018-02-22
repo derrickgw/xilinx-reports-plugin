@@ -43,12 +43,15 @@ public class VivadoUtilizationBuildStep extends Recorder implements SimpleBuildS
     @DataBoundConstructor
     public VivadoUtilizationBuildStep(String report) {
         this.report = report;
+
         chosenParsers = new ArrayList<>();
-        chosenParsers.add(new VivadoUtilizationParser(report));
+        VivadoUtilizationParser parser = new VivadoUtilizationParser(report);
+        chosenParsers.add(parser);
+
         recorder = new MemoryMapRecorder(chosenParsers);
         recorder.setScale("default");
         recorder.setShowBytesOnGraph(false);
-        recorder.setWordSize(16); //Actually radix.
+        recorder.setWordSize(parser.getDefaultWordSize()); //Actually radix.
     }
 
     /**
