@@ -7,7 +7,11 @@ import hudson.model.BuildListener;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Label;
+import javaposse.jobdsl.dsl.DslFactory;
+import javaposse.jobdsl.plugin.ExecuteDslScripts;
+import javaposse.jobdsl.plugin.RemovedJobAction;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
+import org.jenkinsci.plugins.workflow.cps.DSL;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Rule;
@@ -32,11 +36,33 @@ public class VivadoUtilizationBuildStepTest {
         }
     }
 
+    private static final String dslScript = "" +
+            "job ('utilization_GEN'){\n" +
+            "    publishers {\n" +
+            "        xilinxUtilization {\n" +
+            "            reportName 'utilization.rpt'\n" +
+            "            graph {\n" +
+            "                graphCaption  'DSPs'\n" +
+            "                graphDataList 'DSPs'\n" +
+            "            }\n" +
+            "            graph {\n" +
+            "                graphCaption  'BRAM'\n" +
+            "                graphDataList 'Block_RAM_Tile'\n" +
+            "            }\n" +
+            "            graph {\n" +
+            "                graphCaption  'Slices'\n" +
+            "                graphDataList 'Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs'\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
+
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
 
     private String report_file = "utilization.rpt";
     private FreeStyleProject project;
+    private static Logger log = Logger.getLogger("VivadoUtilizationBuildStepTest");
 
     @Test
     public void testConfigRoundtrip() throws Exception {
@@ -81,7 +107,26 @@ public class VivadoUtilizationBuildStepTest {
         }
         return "";
     }
-    private static Logger log = Logger.getLogger("VivadoUtilizationBuildStepTest");
+
+
+    @Test
+    public void testSeedJob() throws Exception {
+        FreeStyleProject seedJob = jenkins.createFreeStyleProject();
+
+        ExecuteDslScripts.ScriptLocation dslScriptLocation = new ExecuteDslScripts.ScriptLocation(null, "", dslScript);
+        seedJob.getBuildersList().add(new ExecuteDslScripts(dslScriptLocation, true, RemovedJobAction.IGNORE));
+        jenkins.buildAndAssertSuccess(seedJob);
+
+        //TODO: find and run the generated job
+//        project = jenkins.
+//        project.getPublishersList().add(dut);
+//
+//        setUpFreeStyle();
+//        FreeStyleBuild build = jenkins.buildAndAssertSuccess(project);
+//        jenkins.assertLogContains("Printing configuration", build);
+//        jenkins.assertLogContains("Xilinx Utilization", build);
+    }
+
     @Test
     public void testScriptedPipeline() throws Exception {
         log.info("I'm starting");
@@ -102,5 +147,6 @@ public class VivadoUtilizationBuildStepTest {
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
         jenkins.assertLogContains("Xilinx Utilization", completedBuild);
     }
+
 
 }

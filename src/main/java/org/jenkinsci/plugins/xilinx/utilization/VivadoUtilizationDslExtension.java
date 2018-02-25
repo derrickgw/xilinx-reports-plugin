@@ -17,9 +17,9 @@ job {
     publishers {
         xilinxUtilization {
             reportName (String reportName)
-            graph {
+            graphConfigs {
                 graphCaption  (String graphCaption)
-                graphDataList (String graphData)
+                graphDataList (String graphDataList)
             }
         }
     }
@@ -30,7 +30,7 @@ job {
 job ('utilization_GEN'){
     publishers {
         xilinxUtilization {
-            parserTitle 'utilization.rpt'
+            reportName 'utilization.rpt'
             graph {
                 graphCaption  'DSPs'
                 graphDataList 'DSPs'
@@ -54,31 +54,28 @@ public class VivadoUtilizationDslExtension extends ContextExtensionPoint {
     
     @RequiresPlugin(id = "xilinx-reports", minimumVersion = "0.1")
     @DslExtensionMethod(context = PublisherContext.class)
-    public Object memoryMap(Runnable closure){
+    public Object xilinxUtilization(Runnable closure){
         VivadoUtilizationJobDslContext context = new VivadoUtilizationJobDslContext();
         executeInContext(closure, context);
 
-        return new VivadoUtilizationBuildStep(context.reportName, context.graphConfigurations);
+        return new VivadoUtilizationBuildStep(context.reportName, context.graphConfigs);
     }
 
 
     public class VivadoUtilizationJobDslContext implements Context {
-
         String reportName = "utilization.rpt";
+        List<MemoryMapGraphConfiguration> graphConfigs = new ArrayList<>();
 
         public void reportName(String value) {
             reportName = value;
         }
-        
-        List<MemoryMapGraphConfiguration> graphConfigurations = new ArrayList<>();
 
         public void graph(Runnable closure){
             VivadoUtilizationGraphDslContext context = new VivadoUtilizationGraphDslContext();
             executeInContext(closure, context);
 
-            graphConfigurations.add(new MemoryMapGraphConfiguration(context.graphDataList, context.graphCaption));
+            graphConfigs.add(new MemoryMapGraphConfiguration(context.graphDataList, context.graphCaption));
         }
-
 
     }
 
