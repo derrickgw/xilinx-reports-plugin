@@ -1,6 +1,9 @@
 package org.jenkinsci.plugins.xilinx.utilization;
 
 import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Label;
@@ -10,12 +13,24 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.TestBuilder;
 
-import java.io.File;
-import java.nio.file.Paths;
-import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Logger;
 
 public class VivadoUtilizationBuildStepTest {
+
+    private class GetReport extends TestBuilder {
+        public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
+                BuildListener listener) throws InterruptedException, IOException {
+            FilePath file = build.getWorkspace().child(report_file);
+            file.copyFrom(VivadoUtilizationBuildStepTest.class.getResource(report_file));
+            return true;
+        }
+    }
 
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
@@ -34,47 +49,58 @@ public class VivadoUtilizationBuildStepTest {
     @Test
     public void testFreeStyleBuild() throws Exception {
         setUpFreeStyle();
-        //Run job to create workspace
-        jenkins.buildAndAssertSuccess(project);
-        FilePath workspace = project.getSomeWorkspace();
-        FilePath file = new FilePath(workspace, report_file);
-        file.copyFrom(VivadoUtilizationBuildStepTest.class.getResource(report_file));
-
-        //Now run for real
         FreeStyleBuild build = jenkins.buildAndAssertSuccess(project);
-        System.out.println(build.getLogText());
         jenkins.assertLogContains("Printing configuration", build);
         jenkins.assertLogContains("Xilinx Utilization", build);
     }
 
-    public void setUpFreeStyle() throws Exception {
+    private void setUpFreeStyle() throws Exception {
         VivadoUtilizationBuildStep dut = new VivadoUtilizationBuildStep(report_file, VivadoUtilizationParser.defaultGraphConfiguration);
         project = jenkins.createFreeStyleProject();
+        project.getBuildersList().add(new GetReport());
         project.getPublishersList().add(dut);
     }
 
+    private String getReportFileString(){
+        try {
+
+            InputStream inputStream = VivadoUtilizationBuildStepTest.class.getResourceAsStream(report_file);
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) != -1) {
+                result.write(buffer, 0, length);
+            }
+
+        // StandardCharsets.UTF_8.name() > JDK 7
+            return result.toString("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        return "";
+    }
+    private static Logger log = Logger.getLogger("VivadoUtilizationBuildStepTest");
     @Test
     public void testScriptedPipeline() throws Exception {
-        //TODO: figure out how to copy a resource to a pipeline workspace.
+        log.info("I'm starting");
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
 
         String pipelineScript
                 = "node {\n"
-                + "  xilinxUtilization report: '" + report_file + "' \n"
+                + "  writeFile file: 'utilization.rpt', text: '''" + getReportFileString() + "'''\n\n"
+                + "  xilinxUtilization report: 'utilization.rpt' \n"
                 + "      graphConfiguration: [[graphCaption: 'DSPs', graphDataList: 'DSPs'], \n"
                 + "                           [graphCaption: 'BRAM', graphDataList: 'Block_RAM_Tile'], \n"
                 + "                           [graphCaption: 'Slices', graphDataList: 'Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs']] \n"
                 + "}";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-//        File buildDir = job.getBuildDir();
-//        FilePath file = new FilePath(new FilePath(buildDir), report_file);
-//        file.copyFrom(VivadoUtilizationBuildStepTest.class.getResource(report_file));
 
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
-//        jenkins.assertLogContains("Printing Configuration", completedBuild);
-//        jenkins.assertLogContains("Xilinx Utilization", completedBuild);
+        jenkins.assertLogContains("Xilinx Utilization", completedBuild);
     }
 
 }
