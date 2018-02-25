@@ -9,7 +9,6 @@ import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.File;
@@ -17,6 +16,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,16 +25,22 @@ import java.util.regex.Pattern;
 @Extension
 public class VivadoUtilizationParser extends AbstractMemoryMapParser implements Serializable {
     private static final Logger LOG = Logger.getLogger(VivadoUtilizationParser.class.getName());
+    private static final int RADIX = 10;
 
-    private static final ArrayList<MemoryMapGraphConfiguration> xilinxUtilizationGraphs = new ArrayList<MemoryMapGraphConfiguration>() {{
+    public static final ArrayList<MemoryMapGraphConfiguration> defaultGraphConfiguration = new ArrayList<MemoryMapGraphConfiguration>() {{
         add(new MemoryMapGraphConfiguration("Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs", "Slices"));
         add(new MemoryMapGraphConfiguration("DSPs", "DSPs"));
         add(new MemoryMapGraphConfiguration("Block_RAM_Tile", "BRAM"));
     }};
+    public static final String defaultReport = "utilization.rpt";
+    private String report = defaultReport;
 
-    @DataBoundConstructor
-    public VivadoUtilizationParser(String utlilizationReport) {
-        super("Xilinx Utilization", utlilizationReport, utlilizationReport, 8, false, xilinxUtilizationGraphs);
+    public VivadoUtilizationParser(String report, List<MemoryMapGraphConfiguration> graphConfiguration) {
+        super("Xilinx Utilization", report, report, RADIX, false, graphConfiguration);
+    }
+
+    public String getReport() {
+        return report;
     }
 
     public VivadoUtilizationParser() {
@@ -112,7 +118,7 @@ public class VivadoUtilizationParser extends AbstractMemoryMapParser implements 
      * This is actually used as the radix
      */
     public int getDefaultWordSize() {
-        return 10;
+        return RADIX;
     }
 
     private static class MemoryMapMemItemComparator implements Comparator<MemoryMapConfigMemoryItem>, Serializable {
