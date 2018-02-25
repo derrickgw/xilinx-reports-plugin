@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class VivadoUtilizationBuildStepTest {
@@ -42,16 +43,16 @@ public class VivadoUtilizationBuildStepTest {
             "        xilinxUtilization {\n" +
             "            reportName 'utilization.rpt'\n" +
             "            graph {\n" +
+            "                graphCaption  'Slices'\n" +
+            "                graphDataList 'Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs'\n" +
+            "            }\n" +
+            "            graph {\n" +
             "                graphCaption  'DSPs'\n" +
             "                graphDataList 'DSPs'\n" +
             "            }\n" +
             "            graph {\n" +
             "                graphCaption  'BRAM'\n" +
             "                graphDataList 'Block_RAM_Tile'\n" +
-            "            }\n" +
-            "            graph {\n" +
-            "                graphCaption  'Slices'\n" +
-            "                graphDataList 'Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs'\n" +
             "            }\n" +
             "        }\n" +
             "    }\n" +
@@ -114,17 +115,21 @@ public class VivadoUtilizationBuildStepTest {
         FreeStyleProject seedJob = jenkins.createFreeStyleProject();
 
         ExecuteDslScripts.ScriptLocation dslScriptLocation = new ExecuteDslScripts.ScriptLocation(null, "", dslScript);
-        seedJob.getBuildersList().add(new ExecuteDslScripts(dslScriptLocation, true, RemovedJobAction.IGNORE));
+        ExecuteDslScripts dslStep = new ExecuteDslScripts(dslScriptLocation, true, RemovedJobAction.IGNORE);
+        seedJob.getBuildersList().add(dslStep);
         jenkins.buildAndAssertSuccess(seedJob);
 
-        //TODO: find and run the generated job
-//        project = jenkins.
-//        project.getPublishersList().add(dut);
-//
-//        setUpFreeStyle();
-//        FreeStyleBuild build = jenkins.buildAndAssertSuccess(project);
-//        jenkins.assertLogContains("Printing configuration", build);
-//        jenkins.assertLogContains("Xilinx Utilization", build);
+        List<FreeStyleProject> projects = jenkins.getInstance().getAllItems(FreeStyleProject.class);
+        for (FreeStyleProject project :
+                projects) {
+            if (project.getName().equals("utilization_GEN")) {
+                VivadoUtilizationBuildStep defaultConfig = new VivadoUtilizationBuildStep(report_file, VivadoUtilizationParser.defaultGraphConfiguration);
+                jenkins.assertEqualDataBoundBeans(defaultConfig, project.getPublishersList().get(0));
+
+                project.getBuildersList().add(new GetReport());
+                jenkins.buildAndAssertSuccess(project);
+            }
+        }
     }
 
     @Test
