@@ -123,8 +123,8 @@ public class VivadoUtilizationBuildStepTest {
     public void testSeedJob() throws Exception {
         FreeStyleProject seedJob = jenkins.createFreeStyleProject();
 
-        ExecuteDslScripts.ScriptLocation dslScriptLocation = new ExecuteDslScripts.ScriptLocation(null, "", dslScript);
-        ExecuteDslScripts dslStep = new ExecuteDslScripts(dslScriptLocation, true, RemovedJobAction.IGNORE);
+        ExecuteDslScripts dslStep = new ExecuteDslScripts();
+        dslStep.setScriptText(dslScript);
         seedJob.getBuildersList().add(dslStep);
         jenkins.buildAndAssertSuccess(seedJob);
 
