@@ -52,24 +52,20 @@ public class VivadoUtilizationBuildStep extends Recorder implements SimpleBuildS
 
     public List<MemoryMapGraphConfiguration> getGraphConfiguration() {
         if (this.parser == null)
-            return VivadoUtilizationParser.defaultGraphConfiguration;
+            return VivadoUtilizationParser.getDefaultGraphConfig();
         else
             return this.parser.getGraphConfiguration();
     }
 
-    public List<MemoryMapGraphConfiguration> getDefaultGraphConfiguration() {
-        return VivadoUtilizationParser.defaultGraphConfiguration;
-    }
-
     public String getReport() {
         if (this.parser == null)
-            return VivadoUtilizationParser.defaultReport;
+            return getDefaultReport();
         else
             return this.parser.getReport();
     }
 
     public String getDefaultReport() {
-        return VivadoUtilizationParser.defaultReport;
+        return "xilinx_utilization.rpt";
     }
 
     @Override
