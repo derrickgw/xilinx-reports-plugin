@@ -7,11 +7,10 @@ import hudson.model.BuildListener;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Label;
-import javaposse.jobdsl.dsl.DslFactory;
 import javaposse.jobdsl.plugin.ExecuteDslScripts;
 import javaposse.jobdsl.plugin.RemovedJobAction;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
-import org.jenkinsci.plugins.workflow.cps.DSL;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Rule;
@@ -23,16 +22,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class VivadoUtilizationBuildStepTest {
 
-    private class GetReport extends TestBuilder {
+    private static final String TEST_REPORT= "utilization.rpt";
+
+    private class GenerateReport extends TestBuilder {
+        private String reportName;
+
+        public GenerateReport(String reportName) {
+            this.reportName = reportName;
+        }
+
         public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                 BuildListener listener) throws InterruptedException, IOException {
-            FilePath file = build.getWorkspace().child(report_file);
-            file.copyFrom(VivadoUtilizationBuildStepTest.class.getResource(report_file));
+            FilePath file = Objects.requireNonNull(build.getWorkspace()).child(reportName);
+            file.copyFrom(VivadoUtilizationBuildStepTest.class.getResource(TEST_REPORT));
             return true;
         }
     }
@@ -61,15 +70,16 @@ public class VivadoUtilizationBuildStepTest {
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
 
-    private String report_file = "utilization.rpt";
+    private String reportFile = "post_route_util.rpt";
     private FreeStyleProject project;
     private static Logger log = Logger.getLogger("VivadoUtilizationBuildStepTest");
+    private List<MemoryMapGraphConfiguration> graphConfig = new ArrayList<>(VivadoUtilizationParser.getDefaultGraphConfig());
 
     @Test
     public void testConfigRoundtrip() throws Exception {
         setUpFreeStyle();
         FreeStyleProject config_project = jenkins.configRoundtrip(project);
-        jenkins.assertEqualDataBoundBeans(new VivadoUtilizationBuildStep(report_file, VivadoUtilizationParser.defaultGraphConfiguration),
+        jenkins.assertEqualDataBoundBeans(new VivadoUtilizationBuildStep(reportFile, graphConfig),
                 config_project.getPublishersList().get(0));
     }
 
@@ -82,16 +92,17 @@ public class VivadoUtilizationBuildStepTest {
     }
 
     private void setUpFreeStyle() throws Exception {
-        VivadoUtilizationBuildStep dut = new VivadoUtilizationBuildStep(report_file, VivadoUtilizationParser.defaultGraphConfiguration);
+        graphConfig.add(new MemoryMapGraphConfiguration("MMCME2_ADV+PLLE2_ADV", "Clocking"));
+        VivadoUtilizationBuildStep dut = new VivadoUtilizationBuildStep(reportFile, graphConfig);
         project = jenkins.createFreeStyleProject();
-        project.getBuildersList().add(new GetReport());
+        project.getBuildersList().add(new GenerateReport(reportFile));
         project.getPublishersList().add(dut);
     }
 
     private String getReportFileString(){
         try {
 
-            InputStream inputStream = VivadoUtilizationBuildStepTest.class.getResourceAsStream(report_file);
+            InputStream inputStream = VivadoUtilizationBuildStepTest.class.getResourceAsStream(TEST_REPORT);
             ByteArrayOutputStream result = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int length;
@@ -101,8 +112,6 @@ public class VivadoUtilizationBuildStepTest {
 
         // StandardCharsets.UTF_8.name() > JDK 7
             return result.toString("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -123,10 +132,10 @@ public class VivadoUtilizationBuildStepTest {
         for (FreeStyleProject project :
                 projects) {
             if (project.getName().equals("utilization_GEN")) {
-                VivadoUtilizationBuildStep defaultConfig = new VivadoUtilizationBuildStep(report_file, VivadoUtilizationParser.defaultGraphConfiguration);
+                VivadoUtilizationBuildStep defaultConfig = new VivadoUtilizationBuildStep("utilization.rpt", VivadoUtilizationParser.getDefaultGraphConfig());
                 jenkins.assertEqualDataBoundBeans(defaultConfig, project.getPublishersList().get(0));
 
-                project.getBuildersList().add(new GetReport());
+                project.getBuildersList().add(new GenerateReport("utilization.rpt"));
                 jenkins.buildAndAssertSuccess(project);
             }
         }
