@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -27,20 +28,23 @@ public class VivadoUtilizationParser extends AbstractMemoryMapParser implements 
     private static final Logger LOG = Logger.getLogger(VivadoUtilizationParser.class.getName());
     private static final int RADIX = 10;
 
-    public static final ArrayList<MemoryMapGraphConfiguration> defaultGraphConfiguration = new ArrayList<MemoryMapGraphConfiguration>() {{
+    private static final ArrayList<MemoryMapGraphConfiguration> defaultGraphConfiguration = new ArrayList<MemoryMapGraphConfiguration>() {{
         add(new MemoryMapGraphConfiguration("Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs", "Slices"));
         add(new MemoryMapGraphConfiguration("DSPs", "DSPs"));
         add(new MemoryMapGraphConfiguration("Block_RAM_Tile", "BRAM"));
     }};
-    public static final String defaultReport = "utilization.rpt";
-    private String report = defaultReport;
 
     public VivadoUtilizationParser(String report, List<MemoryMapGraphConfiguration> graphConfiguration) {
         super("Xilinx Utilization", report, report, RADIX, false, graphConfiguration);
     }
 
+    public static List<MemoryMapGraphConfiguration> getDefaultGraphConfig()
+    {
+        return Collections.unmodifiableList(defaultGraphConfiguration);
+    }
+
     public String getReport() {
-        return report;
+        return super.getConfigurationFile();
     }
 
     public VivadoUtilizationParser() {
