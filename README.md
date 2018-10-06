@@ -1,4 +1,5 @@
-# fpga_reporting
+# xilinx-reports Jenkins plugin
+
 Jenkins Plugin for various reporting that would be useful for an FPGA project
 
 Example for plotting BRAM, Slice and DSP utilization in a pipeline:
