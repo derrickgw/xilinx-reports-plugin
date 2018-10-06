@@ -97,9 +97,9 @@ public class VivadoUtilizationParser extends AbstractMemoryMapParser implements 
                 int total = Integer.parseUnsignedInt(cells[4].trim());
                 int unused = total - used;
 
-                String total_str = Integer.toString(total);
-                String used_str = Integer.toString(used);
-                String unused_str = Integer.toString(unused);
+                String total_str = "0x" + Integer.toHexString(total);
+                String used_str = "0x" + Integer.toHexString(used);
+                String unused_str = "0x" + Integer.toHexString(unused);
                 items.add(new MemoryMapConfigMemoryItem(name, "0", total_str, used_str, unused_str));
             }
         }
