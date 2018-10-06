@@ -31,21 +31,6 @@ public class VivadoUtilizationParserTest {
 
     }
 
-    @Test
-    public void getDefaultWordSize(){
-        // 0x10 words with a word size of 8 is 16, right?
-        // But word size is actually radix.
-        //We need to know if this behavior ever changes.
-        String value = "0x10";
-        String scale = "default";
-        assertEquals(8.0, HexUtils.wordCount(value, 8, scale), 0.0);
-        assertEquals(16.0, HexUtils.wordCount(value, 16, scale), 0.0);
-        assertEquals(10.0, HexUtils.wordCount(value, 10, scale), 0.0);
-
-        // As long as wordSize actually means radix, this should give use the right result.
-        assertEquals(10, dut.getDefaultWordSize());
-    }
-
     private static void ItemFactory(String name, int used, int available)
     {
         String safe_name = name.trim().replace(" ", "_");
@@ -89,9 +74,9 @@ public class VivadoUtilizationParserTest {
         for (MemoryMapConfigMemoryItem item : configMemory) {
             MemoryMapConfigMemoryItem golden_item = myMap.get(item.getName());
             if (golden_item != null) {
-                assertEquals(item.getName(), golden_item.getLength(), item.getLength());
-                assertEquals(item.getName(), golden_item.getUsed(), item.getUsed());
-                assertEquals(item.getName(), golden_item.getUnused(), item.getUnused());
+                assertEquals(item.getName(), Integer.getInteger(golden_item.getLength()), Integer.getInteger(item.getLength()));
+                assertEquals(item.getName(), Integer.getInteger(golden_item.getUsed()), Integer.getInteger(item.getUsed()));
+                assertEquals(item.getName(), Integer.getInteger(golden_item.getUnused()), Integer.getInteger(item.getUnused()));
                 assertions++;
             }
         }
