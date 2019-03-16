@@ -25,6 +25,7 @@
         <workflow-step.version>2.13</workflow-step.version>
         <workflow-job.version>2.16</workflow-job.version>
         <structs.version>1.13</structs.version>
+        <credentials.version>2.0.4</credentials.version>
         <antisamy-markup-formatter.version>1.5</antisamy-markup-formatter.version>
         <script-security.version>1.50</script-security.version>
         <antlr4-runtime.version>4.7</antlr4-runtime.version>
@@ -61,6 +62,11 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>script-security</artifactId>
             <version>${script-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>credentials</artifactId>
+            <version>${credentials.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
