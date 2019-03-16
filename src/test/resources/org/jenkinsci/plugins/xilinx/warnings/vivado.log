@@ -1,0 +1,47 @@
+****** Vivado v2017.2 (64-bit)
+  **** SW Build 1909853 on Thu Jun 15 18:39:10 MDT 2017
+  **** IP Build 1909766 on Thu Jun 15 19:58:00 MDT 2017
+    ** Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 1516.395 ; gain = 88.000 ; free physical = 7597 ; free virtual = 38138
+---------------------------------------------------------------------------------
+INFO: [Synth 8-638] synthesizing module 'xpm_fifo_async' [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv:1687]
+INFO: [Synth 8-638] synthesizing module 'xpm_fifo_base' [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv:57]
+INFO: [Synth 8-638] synthesizing module 'xpm_memory_base' [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv:58]
+INFO: [Synth 8-5572] Synth: [XPM_MEMORY 20-2] MEMORY_INIT_FILE (none), MEMORY_INIT_PARAM together specify no memory initialization. Initial memory contents will be all 0's.   [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv:444]
+WARNING: [Synth 8-6014] Unused sequential element gen_wr_a.gen_word_wide.addralsb_reg was removed.  [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv:1275]
+INFO: [Synth 8-5772] Detected attribute (* rw_addr_collision = "no" *) on RAM gen_wr_a.gen_word_wide.mem_reg
+INFO: [Synth 8-5772] Detected attribute (* ram_ecc = "no_ecc" *) on RAM gen_wr_a.gen_word_wide.mem_reg
+Info : Asymmetric Ram write pattern identified
+INFO: [Synth 8-4563] Found possible Asymmetric RAM pattern for RAM gen_wr_a.gen_word_wide.mem_reg
+INFO: [Synth 8-256] done synthesizing module 'xpm_memory_base' (1#1) [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv:58]
+INFO: [Synth 8-638] synthesizing module 'xpm_cdc_gray' [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv:204]
+INFO: [Synth 8-5534] Detected attribute (* ASYNC_REG = "TRUE" *) [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv:262]
+WARNING: [Synth 8-6014] Unused sequential element dest_out_bin_ff_reg was removed.  [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv:302]
+INFO: [Synth 8-256] done synthesizing module 'xpm_cdc_gray' (2#1) [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv:204]
+INFO: [Synth 8-226] default block is never used [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv:934]
+INFO: [Synth 8-5772] Detected attribute (* rw_addr_collision = "no" *) on RAM gen_wr_a.gen_word_wide.mem_reg
+INFO: [Synth 8-256] done synthesizing module 'xpm_fifo_base' (9#1) [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv:57]
+INFO: [Synth 8-5772] Detected attribute (* rw_addr_collision = "no" *) on RAM gen_wr_a.gen_word_wide.mem_reg
+INFO: [Synth 8-256] done synthesizing module 'xpm_fifo_async' (10#1) [/fpga_tools/Xilinx/Vivado/2017.2/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv:1687]
+
+INFO: [Synth 8-638] synthesizing module 'axis_assign' [/data/tmp/jenkins/workspace/generate_bitfile/firmware/src/buses/axis_interface/axis.sv:11]
+CRITICAL WARNING: [Synth 8-3848] Net dout\.user in module/entity axis_assign does not have driver. [/data/tmp/jenkins/workspace/generate_bitfile/firmware/src/buses/axis_interface/axis.sv:16]
+INFO: [Synth 8-256] done synthesizing module 'axis_assign' (80#1) [/data/tmp/jenkins/workspace/generate_bitfile/firmware/src/buses/axis_interface/axis.sv:11]
+
+
+CRITICAL WARNING: [Place 30-568] A LUT 'top/external_io/sclk_r_i_1__0' is driving clock pin of 19 registers. This could lead to large hold time violations. First few involved registers are:
+	nanoc/external_io/esa/seid_resa/rx/sei_phy_listen/data_reg[1] {FDRE}
+	nanoc/external_io/esa/seid_resa/rx/sei_phy_listen/s_raw_rx_data_reg[6] {FDRE}
+	nanoc/external_io/esa/seid_resa/rx/sei_phy_listen/bit_counter_reg[1] {FDRE}
+	nanoc/external_io/esa/seid_resa/rx/sei_phy_listen/data_reg[3] {FDRE}
+	nanoc/external_io/esa/seid_resa/rx/sei_phy_listen/s_raw_rx_data_reg[0] {FDRE}
+
+ERROR: [Place 30-132] Unroutable Placement! A BUFR / MMCM component pair is not placed in a routable site pair. The pair can use the dedicated path between them if they are placed in the same clock region. If this sub optimal condition is acceptable for this design, you may use the CLOCK_DEDICATED_ROUTE constraint in the .xdc file to demote this message to a WARNING. However, the use of this override is highly discouraged. These examples can be used directly in the .xdc file to override this clock rule.
+	< set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets top/sys_clk_buf] >
+
+	top/sys_clk_bufr (BUFR.O) is provisionally placed by clockplacer on BUFR_X0Y12
+	top/mmcm_base_i2 (MMCME2_ADV.CLKIN1) is provisionally placed by clockplacer on MMCME2_ADV_X0Y3
+	top/mmcm_adv_inst (MMCME2_ADV.CLKIN1) is provisionally placed by clockplacer on MMCME2_ADV_X0Y4
+
+Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device | Checksum: cfddb7c3
