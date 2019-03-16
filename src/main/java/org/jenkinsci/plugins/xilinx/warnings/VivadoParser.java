@@ -48,7 +48,7 @@ public class VivadoParser extends LookaheadParser {
     private String getModuleList()
     {
         if (module_path.isEmpty())
-            return "-";
+            return "unknown";
 
         StringBuilder buf = new StringBuilder("/");
         for(String m : module_path)
