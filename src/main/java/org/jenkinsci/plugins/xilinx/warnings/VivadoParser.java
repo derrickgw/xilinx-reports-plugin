@@ -33,7 +33,6 @@ public class VivadoParser extends LookaheadParser {
             int nameStart = push.length();
             int nameEnd = line.indexOf("'", nameStart);
             module_path.addLast(line.substring(nameStart, nameEnd));
-            System.out.println(getModuleList());
         }
         else if (line.startsWith(pop))
         {
@@ -41,7 +40,7 @@ public class VivadoParser extends LookaheadParser {
             int nameStart = pop.length();
             int nameEnd = line.indexOf("'", nameStart);
             String expected_name = line.substring(nameStart, nameEnd);
-            //TODO: how to log an error from here.
+            //TODO: how to log an error from here in names don't match.
         }
     }
 
