@@ -2,13 +2,8 @@ package org.jenkinsci.plugins.xilinx.utilization;
 
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
-import hudson.model.FreeStyleBuild;
-import hudson.model.FreeStyleProject;
-import hudson.model.Label;
+import hudson.model.*;
 import javaposse.jobdsl.plugin.ExecuteDslScripts;
-import javaposse.jobdsl.plugin.RemovedJobAction;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -21,7 +16,6 @@ import org.jvnet.hudson.test.TestBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -151,10 +145,11 @@ public class VivadoUtilizationBuildStepTest {
         String pipelineScript
                 = "node {\n"
                 + "  writeFile file: 'utilization.rpt', text: '''" + getReportFileString() + "'''\n\n"
-                + "  xilinxUtilization report: 'utilization.rpt' \n"
+                + "  xilinxUtilization([xilinxParser(report: 'utilization.rpt' \n"
                 + "      graphConfiguration: [[graphCaption: 'DSPs', graphDataList: 'DSPs'], \n"
                 + "                           [graphCaption: 'BRAM', graphDataList: 'Block_RAM_Tile'], \n"
-                + "                           [graphCaption: 'Slices', graphDataList: 'Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs']] \n"
+                + "                           [graphCaption: 'Slices', graphDataList: 'Slice_LUTs,Slice_Registers']])\n"
+                + "  ]) \n"
                 + "}";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
 
