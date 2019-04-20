@@ -91,7 +91,7 @@ public class VivadoUtilizationParser extends AbstractMemoryMapParser implements 
             //split returns an empty string for the first group because there is nothing in front of the first separator
             String[] cells = sectionMatched.group(0).split("\\|");
             if (cells[4].trim().matches("\\d+")) {
-                String name = cells[1].trim().replace(' ', '_');
+                String name = cells[1].trim().replace(' ', '_').replace("*", "");
                 // We can use fractional BRAMS, so we have to parse as a float.
                 int used = (int) Float.parseFloat(cells[2].trim());
                 int total = Integer.parseUnsignedInt(cells[4].trim());
