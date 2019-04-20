@@ -21,6 +21,7 @@ import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfigurationDescriptor;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.MemoryMapConfigFileParserDelegate;
 import net.praqma.jenkins.memorymap.parser.MemoryMapMapParserDelegate;
+import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.MemoryMapError;
 import org.jenkinsci.Symbol;
@@ -39,29 +40,22 @@ import java.util.logging.Logger;
 public class VivadoUtilizationBuildStep extends Recorder implements SimpleBuildStep { //extends MemoryMapRecorder {
 
     private static final Logger logger = Logger.getLogger(MemoryMapRecorder.class.getName());
-    private VivadoUtilizationParser parser;
+
+    public List<AbstractMemoryMapParser> chosenParsers;
+
+    public VivadoUtilizationBuildStep(String report, List<MemoryMapGraphConfiguration> graphConfiguration) {
+        this.chosenParsers = new ArrayList<>();
+        this.chosenParsers.add(new VivadoUtilizationParser("xilinx-utilization", "Utilization", report, graphConfiguration));
+    }
 
     @DataBoundConstructor
-    public VivadoUtilizationBuildStep(String report, List<MemoryMapGraphConfiguration> graphConfiguration) {
-        this.parser = new VivadoUtilizationParser(report, graphConfiguration);
+    public VivadoUtilizationBuildStep(List<VivadoUtilizationParser> chosenParsers) {
+        this.chosenParsers = new ArrayList<>();
+        this.chosenParsers.addAll(chosenParsers);
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
-    }
-
-    public List<MemoryMapGraphConfiguration> getGraphConfiguration() {
-        if (this.parser == null)
-            return VivadoUtilizationParser.getDefaultGraphConfig();
-        else
-            return this.parser.getGraphConfiguration();
-    }
-
-    public String getReport() {
-        if (this.parser == null)
-            return getDefaultReport();
-        else
-            return this.parser.getReport();
     }
 
     public String getDefaultReport() {
@@ -70,20 +64,14 @@ public class VivadoUtilizationBuildStep extends Recorder implements SimpleBuildS
 
     @Override
     public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-        listener.getLogger().println("Report Files  = " + parser.getReport() + "!");
-
         PrintStream out = listener.getLogger();
         HashMap<String, MemoryMapConfigMemory> config;
-        List<AbstractMemoryMapParser> chosenParsers;
         MemoryMapRecorder recorder;
-
-        chosenParsers = new ArrayList<>();
-        chosenParsers.add(parser);
 
         recorder = new MemoryMapRecorder(chosenParsers);
         recorder.setScale("default");
         recorder.setShowBytesOnGraph(false);
-        recorder.setWordSize(parser.getDefaultWordSize()); //Actually radix.
+        recorder.setWordSize(VivadoUtilizationParser.RADIX); //Actually radix.
 
         try {
             config = workspace.act(new MemoryMapConfigFileParserDelegate(chosenParsers));
@@ -122,6 +110,12 @@ public class VivadoUtilizationBuildStep extends Recorder implements SimpleBuildS
         public DescriptorImpl() {
             super(VivadoUtilizationBuildStep.class);
             load();
+        }
+
+        public List<MemoryMapParserDescriptor<?>> getParsers() {
+            List<MemoryMapParserDescriptor<?>> ret = new ArrayList<>();
+            ret.add(new VivadoUtilizationParser.DescriptorImpl());
+            return ret;
         }
 
         public List<MemoryMapGraphConfigurationDescriptor<?>> getGraphOptions() {

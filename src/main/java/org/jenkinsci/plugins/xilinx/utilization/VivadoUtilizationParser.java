@@ -9,6 +9,7 @@ import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.File;
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
 @Extension
 public class VivadoUtilizationParser extends AbstractMemoryMapParser implements Serializable {
     private static final Logger LOG = Logger.getLogger(VivadoUtilizationParser.class.getName());
-    private static final int RADIX = 10;
+    public static final int RADIX = 10;
 
     private static final ArrayList<MemoryMapGraphConfiguration> defaultGraphConfiguration = new ArrayList<MemoryMapGraphConfiguration>() {{
         add(new MemoryMapGraphConfiguration("Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs", "Slices"));
@@ -34,8 +35,10 @@ public class VivadoUtilizationParser extends AbstractMemoryMapParser implements 
         add(new MemoryMapGraphConfiguration("Block_RAM_Tile", "BRAM"));
     }};
 
-    public VivadoUtilizationParser(String report, List<MemoryMapGraphConfiguration> graphConfiguration) {
-        super("Xilinx Utilization", report, report, RADIX, false, graphConfiguration);
+    @DataBoundConstructor
+    public VivadoUtilizationParser(String parserUniqueName, String parserTitle, String report, List<MemoryMapGraphConfiguration> graphConfiguration) {
+        super(parserUniqueName, report, report, RADIX, false, graphConfiguration);
+        setParserTitle(parserTitle);
     }
 
     public static List<MemoryMapGraphConfiguration> getDefaultGraphConfig()
