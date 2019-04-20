@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>2.33</version>
+        <version>3.17</version>
         <relativePath />
     </parent>
     <artifactId>xilinx-reports</artifactId>
@@ -13,13 +13,33 @@
     <properties>
         <java.level>8</java.level>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
-        <jenkins.version>2.7.3</jenkins.version>
+        <jenkins.version>2.89.1</jenkins.version>
+        <jenkins-test-harness.version>2.42</jenkins-test-harness.version>
         <!-- Other properties you may want to use:
-          ~ java.level: set to 6 if your jenkins.version <= 1.611
-          ~ jenkins-test-harness.version: Jenkins Test Harness version you use to test the plugin. For Jenkins version >= 1.580.1 use JTH 2.0 or higher.
           ~ hpi-plugin.version: The HPI Maven Plugin version used by the plugin..
           ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin.
-     -->
+        -->
+
+        <!-- Jenkins Plug-in Dependencies Versions -->
+        <matrix-project.version>1.13</matrix-project.version>
+        <workflow-step.version>2.13</workflow-step.version>
+        <workflow-job.version>2.16</workflow-job.version>
+        <structs.version>1.13</structs.version>
+        <credentials.version>2.0.4</credentials.version>
+        <antisamy-markup-formatter.version>1.5</antisamy-markup-formatter.version>
+        <script-security.version>1.50</script-security.version>
+        <antlr4-runtime.version>4.7</antlr4-runtime.version>
+        <gson.version>2.8.5</gson.version>
+
+        <!-- Project Test Dependencies Configuration -->
+        <junit.version>5.4.0</junit.version>
+        <junit-platform-launcher.version>1.4.0</junit-platform-launcher.version>
+        <mockito.version>2.25.0</mockito.version>
+        <assertj.version>3.12.1</assertj.version>
+        <archunit.version>0.9.3</archunit.version>
+        <violations-lib.version>1.82</violations-lib.version>
+        <json.version>20180813</json.version>
+
     </properties>
     <name>Xilinx Reporting Plugin</name>
     <description>A plugin for reporting on various aspects of a Xilinx Vivado FPGA tool flow</description>
@@ -36,58 +56,49 @@
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
         </dependency>
+
+        <!-- Required Jenkins Plug-in Dependencies -->
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>structs</artifactId>
-            <version>1.13</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-step-api</artifactId>
-            <version>2.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-cps</artifactId>
-            <version>2.39</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-job</artifactId>
-            <version>2.11.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-basic-steps</artifactId>
-            <version>2.6</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-durable-task-step</artifactId>
-            <version>2.13</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-api</artifactId>
-            <version>2.20</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-support</artifactId>
-            <version>2.14</version>
-            <scope>test</scope>
+            <artifactId>script-security</artifactId>
+            <version>${script-security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>credentials</artifactId>
-            <version>2.1.4</version>
+            <version>${credentials.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-step-api</artifactId>
+            <version>${workflow-step.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-job</artifactId>
+            <version>${workflow-job.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>structs</artifactId>
+            <version>${structs.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>antisamy-markup-formatter</artifactId>
+            <version>${antisamy-markup-formatter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>${antlr4-runtime.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>net.praqma</groupId>
             <artifactId>memory-map</artifactId>
@@ -98,31 +109,89 @@
             <artifactId>praqmajutils</artifactId>
             <version>1.0.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>job-dsl</artifactId>
             <version>1.68</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>warnings-ng</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.hm.hafner</groupId>
+            <artifactId>analysis-model</artifactId>
+            <version>3.0.0</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>edu.hm.hafner</groupId>
+            <artifactId>analysis-model</artifactId>
+            <version>3.0.0</version>
+            <classifier>tests</classifier>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>${junit-platform-launcher.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5-api</artifactId>
+            <version>${archunit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5-engine</artifactId>
+            <version>${archunit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.jenkins-ci.tools</groupId>
-                <artifactId>maven-hpi-plugin</artifactId>
-                <!-- Older version have some problems with writing the manifest file -->
-                <configuration>
-                    <pluginVersionDescription>${buildNumber}</pluginVersionDescription>
-                    <compatibleSinceVersion>2.0</compatibleSinceVersion>
-                    <scanIntervalSeconds>2</scanIntervalSeconds>
-                    <!--<webAppConfig>-->
-                        <!--<PersistTempDirectory>true</PersistTempDirectory>-->
-                    <!--</webAppConfig>-->
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <!-- If you want this to appear on the wiki page:
     <developers>
       <developer>
@@ -151,4 +220,33 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>display-info</id>
+                            <configuration>
+                                <rules>
+                                    <enforceBytecodeVersion>
+                                        <ignoreClasses>
+                                            <!-- asm dependency from PMD contains a java9 module-info.class -->
+                                            <ignoreClass>module-info</ignoreClass>
+                                            <!-- Junit >= 5.3 contains some java9 classes -->
+                                            <ignoreClass>**/ModuleUtils*</ignoreClass>
+                                        </ignoreClasses>
+                                    </enforceBytecodeVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+    </build>
+
 </project>
