@@ -82,7 +82,7 @@ public class VivadoUtilizationBuildStepTest {
         setUpFreeStyle();
         FreeStyleBuild build = jenkins.buildAndAssertSuccess(project);
         jenkins.assertLogContains("Printing configuration", build);
-        jenkins.assertLogContains("Xilinx Utilization", build);
+        jenkins.assertLogContains("xilinx-utilization", build);
     }
 
     private void setUpFreeStyle() throws Exception {
@@ -145,7 +145,7 @@ public class VivadoUtilizationBuildStepTest {
         String pipelineScript
                 = "node {\n"
                 + "  writeFile file: 'utilization.rpt', text: '''" + getReportFileString() + "'''\n\n"
-                + "  xilinxUtilization([xilinxParser(report: 'utilization.rpt' \n"
+                + "  xilinxUtilization([xilinxParser(report: 'utilization.rpt', parserTitle: 'Report', parserUniqueName: 'util-report', \n"
                 + "      graphConfiguration: [[graphCaption: 'DSPs', graphDataList: 'DSPs'], \n"
                 + "                           [graphCaption: 'BRAM', graphDataList: 'Block_RAM_Tile'], \n"
                 + "                           [graphCaption: 'Slices', graphDataList: 'Slice_LUTs,Slice_Registers']])\n"
@@ -154,7 +154,7 @@ public class VivadoUtilizationBuildStepTest {
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
 
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
-        jenkins.assertLogContains("Xilinx Utilization", completedBuild);
+        jenkins.assertLogContains("util-report", completedBuild);
     }
 
 
