@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.xilinx.utilization;
 
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
-import net.praqma.jenkins.memorymap.util.HexUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +54,7 @@ public class VivadoUtilizationParserTest {
         ItemFactory("LUT as Memory        " ,  650,  6000);
         ItemFactory("LUT Flip Flop Pairs  " , 4930, 17600);
         ItemFactory("Block RAM Tile       " ,   47,    60);
-        ItemFactory("RAMB36/FIFO*         " ,   45,    60);
+        ItemFactory("RAMB36/FIFO          " ,   45,    60);
         ItemFactory("RAMB18               " ,    5,   120);
         ItemFactory("DSPs                 " ,   10,    80);
     }

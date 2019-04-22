@@ -11,11 +11,15 @@ Example for plotting BRAM, Slice and DSP utilization in a pipeline:
 ```
 node {
     stage('Publish'){
-        xilinxUtilization graphConfiguration: [
-            [graphCaption: 'BRAMs', graphDataList: 'Block_RAM_Tile'], 
-            [graphCaption: 'Slices', graphDataList: 'Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs'],
-            [graphCaption: 'DSPs', graphDataList: 'DSPs']], 
-            report: 'utilization.rpt'
+        xilinxUtilization([
+            xilinxParser(
+                report: 'utilization.rpt', parserTitle: 'Utilization', parserUniqueName: 'xilinx-utilization',
+                graphConfiguration: [
+                    [graphCaption: 'BRAMs', graphDataList: 'Block_RAM_Tile'],
+                    [graphCaption: 'Slices', graphDataList: 'Slice_LUTs,Slice_Registers,LUT_Flip_Flop_Pairs'],
+                    [graphCaption: 'DSPs', graphDataList: 'DSPs']]
+            )
+        ])
     }
 }
 ```

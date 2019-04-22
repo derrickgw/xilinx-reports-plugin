@@ -5,20 +5,27 @@ import edu.hm.hafner.analysis.IssueParser;
 import edu.hm.hafner.analysis.Report;
 import edu.hm.hafner.analysis.Severity;
 import edu.hm.hafner.analysis.assertj.SoftAssertions;
+import org.junit.Test;
 
 /**
  * Tests the class {@link VivadoParserTest}.
  *
  * @author Derrick Gibelyou
  */
-class VivadoParserTest extends AbstractParserTest {
-    VivadoParserTest() {
+public class VivadoParserTest extends AbstractParserTest {
+    public VivadoParserTest() {
         super("vivado.log");
     }
 
     @Override
     protected IssueParser createParser() {
         return new VivadoWarningParser();
+    }
+
+    @Test
+    public void fooTest()
+    {
+        //Necessary to run inherited tests: https://github.com/junit-team/junit5/issues/1406
     }
 
     @Override
@@ -58,7 +65,7 @@ class VivadoParserTest extends AbstractParserTest {
                 .hasMessage("A LUT 'top/external_io/sclk_r_i_1__0' is driving clock pin of 19 registers. This could lead to large hold time violations. First few involved registers are:")
                 .hasCategory("Place")
                 .hasType("Place 30-568")
-                .hasModuleName("-")
+                .hasModuleName("unknown")
                 .hasSeverity(Severity.WARNING_HIGH);
 
         softly.assertThat(report.get(4))
@@ -68,7 +75,7 @@ class VivadoParserTest extends AbstractParserTest {
                 .hasDescription("<br>\t< set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets top/sys_clk_buf] ><br><br>\ttop/sys_clk_bufr (BUFR.O) is provisionally placed by clockplacer on BUFR_X0Y12<br>\ttop/mmcm_base_i2 (MMCME2_ADV.CLKIN1) is provisionally placed by clockplacer on MMCME2_ADV_X0Y3<br>\ttop/mmcm_adv_inst (MMCME2_ADV.CLKIN1) is provisionally placed by clockplacer on MMCME2_ADV_X0Y4<br>")
                 .hasType("Place 30-132")
                 .hasCategory("Place")
-                .hasModuleName("-")
+                .hasModuleName("unknown")
                 .hasSeverity(Severity.ERROR);
 
 
