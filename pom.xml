@@ -8,7 +8,7 @@
         <relativePath />
     </parent>
     <artifactId>xilinx-reports</artifactId>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.7-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <properties>
         <java.level>8</java.level>
@@ -237,6 +237,12 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>cloudbees-folder</artifactId>
             <version>6.1.0</version>
+            <scope>test</scope>
+        </dependency>
+	<dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>script-security</artifactId>
+            <version>1.54</version>
             <scope>test</scope>
         </dependency>
 
