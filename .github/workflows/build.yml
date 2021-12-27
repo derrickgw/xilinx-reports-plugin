@@ -15,8 +15,7 @@ jobs:
           distribution: 'adopt'
           cache: maven
       - name: Build with Maven
-        run: mvn -B package
-        run: mv target/xilinx-reports.hpi ./xilinx-reports.jpi
+        run: mvn -B package; mv target/xilinx-reports.hpi ./xilinx-reports.jpi
       - name: Archive
         uses: actions/upload-artifact@v2
         with:
